@@ -35,11 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # TODO: figure out if we can run golangci-lint without loading (private) mods
-      - name: Setup for private go modules
-        run: |
-          echo "machine github.com login ${{ secrets.GH_TOKEN_FOR_PACKAGES }} password x-oauth-basic" >> ~/.netrc
-          go env -w GOPRIVATE="github.com/u-next/*"
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
