@@ -35,14 +35,6 @@ func (f *Filter) Apply(pred string, op QueryOperatorable) *Filter {
 	return f
 }
 
-func (f *Filter) ApplyList(pred string, ops []QueryOperatorable) *Filter {
-	for _, op := range ops {
-		f.Apply(pred, op)
-	}
-
-	return f
-}
-
 // Has add has() function to determine if a node has a particular predicate
 func (f *Filter) Has(pred string) *Filter {
 	f.exprs = append(f.exprs, &Expression{

@@ -49,49 +49,6 @@ func TestFilter_Apply(t *testing.T) {
 	}
 }
 
-func TestFilter_ApplyList(t *testing.T) {
-	type fields struct {
-		conj  Conjunction
-		exprs []*Expression
-	}
-	type args struct {
-		pred string
-		ops  []QueryOperatorable
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   string
-	}{
-		{
-			name: "should apply operators correctly",
-			fields: fields{
-				conj: ConjunctionAnd,
-			},
-			args: args{
-				pred: "media.popularity",
-				ops: []QueryOperatorable{
-					&FloatQueryOperator{Gt: pointerizer.F64(0.5)},
-				},
-			},
-			want: "@filter(gt(media.popularity, 0.5))",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			f := &Filter{
-				conj:  tt.fields.conj,
-				exprs: tt.fields.exprs,
-			}
-
-			got := f.ApplyList(tt.args.pred, tt.args.ops).Build()
-
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 func TestFilter_Has(t *testing.T) {
 	type fields struct {
 		conj  Conjunction
