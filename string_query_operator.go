@@ -50,7 +50,7 @@ func (op *StringQueryOperator) execute(pred string) *Expression {
 	}
 
 	if op.Regexp != nil {
-		fns = append(fns, function.NewRegexp(pred, strconv.Quote(*op.Regexp)))
+		fns = append(fns, function.NewRegexp(pred, *op.Regexp))
 	}
 
 	if op.Allofterms != nil {
