@@ -93,7 +93,7 @@ func main() {
 		Has("popularity").
 		Build()
 
-    // @filter(has(popularity, 0.5))
+    // @filter(has(popularity))
     fmt.Print(clause)
 }
 ```
