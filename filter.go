@@ -8,6 +8,8 @@ import (
 )
 
 // Filter is a builder to construct filter directive
+//
+// https://github.com/u-next/dbuilder
 type Filter struct {
 	conj  Conjunction
 	exprs []*Expression
