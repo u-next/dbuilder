@@ -83,6 +83,14 @@ type BooleanQueryOperator struct {
 }
 ```
 
+```go
+type CustomQueryOperator struct {
+	// any valid filter expression in string format
+	// it should contain also the full predicate name.
+	// The predicate passed in the "Apply" method call is ignored.
+	Expression *string 
+}
+```
 ### Has
 
 Determines if a node has a particular predicate.
