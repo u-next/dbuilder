@@ -15,6 +15,7 @@ func main() {
     clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
 		Apply("popularity", &dbuilder.FloatQueryOperator{Eq: pointerizer.F64(0.5)}).
 		Apply("category", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
+		Apply("ignored", &dbuilder.CustomQueryOperator{Expression: pointerizer.S("lt(media.original_release_date, \"1977-01-01\") AND gt(media.original_price, 10)")})
 		Build()
 
     // @filter(eq(popularity, 0.5) AND eq(category, "foo"))
