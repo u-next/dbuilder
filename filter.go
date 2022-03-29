@@ -2,6 +2,7 @@ package dbuilder
 
 import (
 	"fmt"
+	"github.com/u-next/dbuilder/pointerizer"
 	"strings"
 
 	"github.com/u-next/dbuilder/function"
@@ -66,4 +67,25 @@ func (f *Filter) Build() string {
 	}
 
 	return fmt.Sprintf("@filter(%s)", strings.Join(ret, f.conj.String()))
+}
+
+// ToCustomQueryOperator returns an Operator with the content of the @filter directive e.g.
+//
+//   - gt(original_price, 500)
+//   - gt(original_price, 500) AND gt(popularity, 0.5)
+//   - (gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5)
+//
+// This can be used to build partial filters to be included in other filters, e.g.:
+// partialFilter := &dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+//		Apply("other", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
+// 		ToCustomQueryOperator()
+// dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+//		Apply("popularity", &dbuilder.FloatQueryOperator{Eq: pointerizer.F64(0.5)}).
+//		Apply("", partialFilter)
+func (f *Filter) ToCustomQueryOperator() *CustomQueryOperator {
+	filterString := f.Build()
+	if len(filterString) <= 0 {
+		return &CustomQueryOperator{Expression: &filterString}
+	}
+	return &CustomQueryOperator{Expression: pointerizer.S(filterString[8 : len(filterString)-1])}
 }

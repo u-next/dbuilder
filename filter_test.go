@@ -130,9 +130,11 @@ func TestFilter_Build(t *testing.T) {
 							function.NewGt("popularity", 0.5),
 						},
 					},
+					(&CustomQueryOperator{Expression: pointerizer.S(`(lt(media.original_release_date, "1977-01-01") OR gt(media.original_price, 10))`)}).execute("ignore"),
+					NewFilter(ConjunctionAnd).Apply("other", &StringQueryOperator{Eq: pointerizer.S("foo")}).ToCustomQueryOperator().execute("ignore"),
 				},
 			},
-			want: `@filter(gt(original_price, 500) AND gt(popularity, 0.5))`,
+			want: `@filter(gt(original_price, 500) AND gt(popularity, 0.5) AND (lt(media.original_release_date, "1977-01-01") OR gt(media.original_price, 10)) AND eq(other, "foo"))`,
 		},
 		{
 			name: "should return @filter clause with multiple functions in one expression correctly",
@@ -163,6 +165,87 @@ func TestFilter_Build(t *testing.T) {
 			}
 
 			got := f.Build()
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestFilter_ToCustomQueryOperator(t *testing.T) {
+	type fields struct {
+		conj  Conjunction
+		exprs []*Expression
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name:   "should return empty string if no expressions",
+			fields: fields{},
+			want:   "",
+		},
+		{
+			name: "should return @filter content correctly",
+			fields: fields{
+				exprs: []*Expression{
+					{
+						fns: []function.Function{
+							function.NewGt("original_price", 500),
+						},
+					},
+				},
+			},
+			want: `gt(original_price, 500)`,
+		},
+		{
+			name: "should return @filter clause with multiple expressions correctly",
+			fields: fields{
+				exprs: []*Expression{
+					{
+						fns: []function.Function{
+							function.NewGt("original_price", 500),
+						},
+					},
+					{
+						fns: []function.Function{
+							function.NewGt("popularity", 0.5),
+						},
+					},
+				},
+			},
+			want: `gt(original_price, 500) AND gt(popularity, 0.5)`,
+		},
+		{
+			name: "should return @filter clause with multiple functions in one expression correctly",
+			fields: fields{
+				conj: ConjunctionOr,
+				exprs: []*Expression{
+					{
+						fns: []function.Function{
+							function.NewGt("original_price", 500),
+							function.NewLt("original_price", 1000),
+						},
+					},
+					{
+						fns: []function.Function{
+							function.NewGt("popularity", 0.5),
+						},
+					},
+				},
+			},
+			want: `(gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5)`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f := &Filter{
+				conj:  tt.fields.conj,
+				exprs: tt.fields.exprs,
+			}
+
+			got := *f.ToCustomQueryOperator().Expression
 
 			assert.Equal(t, tt.want, got)
 		})

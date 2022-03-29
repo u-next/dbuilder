@@ -12,13 +12,18 @@ go get github.com/u-next/dbuilder
 
 ```go
 func main() {
+    partialFilter := &dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+		Apply("other", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
+ 		ToCustomQueryOperator()
+	
     clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
 		Apply("popularity", &dbuilder.FloatQueryOperator{Eq: pointerizer.F64(0.5)}).
 		Apply("category", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
-		Apply("ignored", &dbuilder.CustomQueryOperator{Expression: pointerizer.S("lt(media.original_release_date, \"1977-01-01\") AND gt(media.original_price, 10)")})
+		Apply("ignored", &dbuilder.CustomQueryOperator{Expression: pointerizer.S("lt(media.original_release_date, \"1977-01-01\") AND gt(media.original_price, 10)")}).
+		Apply("ignored", partialFilter).
 		Build()
 
-    // @filter(eq(popularity, 0.5) AND eq(category, "foo"))
+    // @filter(eq(popularity, 0.5) AND eq(category, "foo") AND lt(media.original_release_date, \"1977-01-01\") AND gt(media.original_price, 10) AND eq(other, "foo") )
     fmt.Print(clause)
 }
 ```
