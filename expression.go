@@ -27,6 +27,6 @@ func (expr *Expression) Build() string {
 			ret = append(ret, fn.String())
 		}
 
-		return fmt.Sprintf("(%s)", strings.Join(ret, Conjunction(ConjunctionAnd).String()))
+		return fmt.Sprintf("(%s)", strings.Join(ret, ConjunctionAnd.String()))
 	}
 }
