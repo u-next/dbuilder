@@ -23,5 +23,5 @@ func (op Type) String() string {
 		return fmt.Sprintf("NOT %s", cls)
 	}
 
-	return fmt.Sprintf("%s", cls)
+	return cls
 }
