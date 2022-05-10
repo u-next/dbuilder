@@ -2,8 +2,9 @@ package dbuilder
 
 import (
 	"fmt"
-	"github.com/u-next/dbuilder/pointerizer"
 	"strings"
+
+	"github.com/u-next/dbuilder/pointerizer"
 
 	"github.com/u-next/dbuilder/function"
 )
@@ -41,6 +42,19 @@ func (f *Filter) Has(pred string) *Filter {
 	f.exprs = append(f.exprs, &Expression{
 		fns: []function.Function{
 			function.NewHas(pred),
+		},
+	})
+
+	return f
+}
+
+// Type add type() function to determine if a node belongs to particular type.
+// `not` controls whether a NOT operator should be appended to the front to
+// invert the results
+func (f *Filter) Type(targetType string, not bool) *Filter {
+	f.exprs = append(f.exprs, &Expression{
+		fns: []function.Function{
+			function.NewType(targetType, not),
 		},
 	})
 

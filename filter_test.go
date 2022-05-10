@@ -88,6 +88,56 @@ func TestFilter_Has(t *testing.T) {
 	}
 }
 
+func TestFilter_Type(t *testing.T) {
+	type fields struct {
+		conj  Conjunction
+		exprs []*Expression
+	}
+	type args struct {
+		targetType string
+		not        bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		{
+			name: "should return type() correctly",
+			fields: fields{
+				conj: ConjunctionAnd,
+			},
+			args: args{
+				targetType: "Foo",
+			},
+			want: "@filter(type(Foo))",
+		},
+		{
+			name: "should return NOT type() correctly",
+			fields: fields{
+				conj: ConjunctionAnd,
+			},
+			args: args{
+				targetType: "Foo",
+				not:        true,
+			},
+			want: "@filter(NOT type(Foo))",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f := &Filter{
+				conj:  tt.fields.conj,
+				exprs: tt.fields.exprs,
+			}
+			got := f.Type(tt.args.targetType, tt.args.not).Build()
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestFilter_Build(t *testing.T) {
 	type fields struct {
 		conj  Conjunction

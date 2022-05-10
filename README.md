@@ -15,7 +15,7 @@ func main() {
     partialFilter := &dbuilder.NewFilter(dbuilder.ConjunctionAnd).
 		Apply("other", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
  		ToCustomQueryOperator()
-	
+
     clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
 		Apply("popularity", &dbuilder.FloatQueryOperator{Eq: pointerizer.F64(0.5)}).
 		Apply("category", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
@@ -94,9 +94,10 @@ type CustomQueryOperator struct {
 	// any valid filter expression in string format
 	// it should contain also the full predicate name.
 	// The predicate passed in the "Apply" method call is ignored.
-	Expression *string 
+	Expression *string
 }
 ```
+
 ### Has
 
 Determines if a node has a particular predicate.
@@ -108,6 +109,21 @@ func main() {
 		Build()
 
     // @filter(has(popularity))
+    fmt.Print(clause)
+}
+```
+
+### Type
+
+Determine if a node belongs to particular type.
+
+```go
+func main() {
+    clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+		Type("Foo", false).
+		Build()
+
+    // @filter(type(Foo))
     fmt.Print(clause)
 }
 ```
