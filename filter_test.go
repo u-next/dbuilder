@@ -265,7 +265,7 @@ func TestFilter_ToCustomQueryOperator(t *testing.T) {
 					},
 				},
 			},
-			want: `gt(original_price, 500) AND gt(popularity, 0.5)`,
+			want: `(gt(original_price, 500) AND gt(popularity, 0.5))`,
 		},
 		{
 			name: "should return @filter clause with multiple functions in one expression correctly",
@@ -285,7 +285,7 @@ func TestFilter_ToCustomQueryOperator(t *testing.T) {
 					},
 				},
 			},
-			want: `(gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5)`,
+			want: `((gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5))`,
 		},
 	}
 	for _, tt := range tests {
