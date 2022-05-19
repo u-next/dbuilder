@@ -86,8 +86,8 @@ func (f *Filter) Build() string {
 // ToCustomQueryOperator returns an Operator with the content of the @filter directive e.g.
 //
 //   - gt(original_price, 500)
-//   - gt(original_price, 500) AND gt(popularity, 0.5)
-//   - (gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5)
+//   - (gt(original_price, 500) AND gt(popularity, 0.5))
+//   - ((gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5))
 //
 // This can be used to build partial filters to be included in other filters, e.g.:
 // partialFilter := &dbuilder.NewFilter(dbuilder.ConjunctionAnd).
@@ -101,5 +101,12 @@ func (f *Filter) ToCustomQueryOperator() *CustomQueryOperator {
 	if len(filterString) <= 0 {
 		return &CustomQueryOperator{Expression: &filterString}
 	}
-	return &CustomQueryOperator{Expression: pointerizer.S(filterString[8 : len(filterString)-1])}
+
+	startIndex := 8
+	endIndex := len(filterString) - 1
+	if len(f.exprs) > 1 { //keep the parenthesis if we have more than one expression
+		startIndex--
+		endIndex++
+	}
+	return &CustomQueryOperator{Expression: pointerizer.S(filterString[startIndex:endIndex])}
 }
