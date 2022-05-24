@@ -10,6 +10,21 @@ go get github.com/u-next/dbuilder
 
 ## Quick Start
 
+**Basic**
+
+```go
+func main() {
+	clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+		Apply("category", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
+		Build()
+
+	// @filter(eq(category, "foo"))
+	fmt.Print(clause)
+}
+```
+
+**CustomQueryOperator**
+
 ```go
 func main() {
     partialFilter := &dbuilder.NewFilter(dbuilder.ConjunctionAnd).
@@ -25,6 +40,19 @@ func main() {
 
     // @filter(eq(popularity, 0.5) AND eq(category, "foo") AND lt(media.original_release_date, "1977-01-01") AND gt(media.original_price, 10) AND eq(other, "foo") )
     fmt.Print(clause)
+}
+```
+
+**Raw Filter String**
+
+```go
+func main() {
+	clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
+		Apply("category", &dbuilder.StringQueryOperator{Eq: pointerizer.S("foo")}).
+		Build()
+
+	// eq(category, "foo")
+	fmt.Print(clause)
 }
 ```
 
@@ -105,7 +133,7 @@ Determines if a node has a particular predicate.
 ```go
 func main() {
     clause := dbuilder.NewFilter(dbuilder.ConjunctionAnd).
-		Has("popularity").
+		Has("popularity", false).
 		Build()
 
     // @filter(has(popularity))
