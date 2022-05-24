@@ -63,13 +63,12 @@ func (f *Filter) Type(targetType string, not bool) *Filter {
 	return f
 }
 
-// Build returns @filter directive e.g.
+// BuildRaw returns the content of the @filter directive e.g.
 //
-//   - @filter(gt(original_price, 500))
-//   - @filter(gt(original_price, 500) AND gt(popularity, 0.5))
-//   - @filter((gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5))
-//
-func (f *Filter) Build() string {
+//   - gt(original_price, 500)
+//   - (gt(original_price, 500) AND gt(popularity, 0.5))
+//   - ((gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5))
+func (f *Filter) BuildRaw() string {
 	if len(f.exprs) <= 0 {
 		return ""
 	}
@@ -82,7 +81,20 @@ func (f *Filter) Build() string {
 		}
 	}
 
-	return fmt.Sprintf("@filter(%s)", strings.Join(ret, f.conj.String()))
+	return strings.Join(ret, f.conj.String())
+}
+
+// Build returns @filter directive e.g.
+//
+//   - @filter(gt(original_price, 500))
+//   - @filter(gt(original_price, 500) AND gt(popularity, 0.5))
+//   - @filter((gt(original_price, 500) AND lt(original_price, 1000)) OR gt(popularity, 0.5))
+func (f *Filter) Build() string {
+	if len(f.exprs) <= 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("@filter(%s)", f.BuildRaw())
 }
 
 // ToCustomQueryOperator returns an Operator with the content of the @filter directive e.g.
@@ -99,16 +111,15 @@ func (f *Filter) Build() string {
 //		Apply("popularity", &dbuilder.FloatQueryOperator{Eq: pointerizer.F64(0.5)}).
 //		Apply("", partialFilter)
 func (f *Filter) ToCustomQueryOperator() *CustomQueryOperator {
-	filterString := f.Build()
-	if len(filterString) <= 0 {
-		return &CustomQueryOperator{Expression: &filterString}
+	str := f.BuildRaw()
+	if len(str) <= 0 {
+		return &CustomQueryOperator{Expression: &str}
 	}
 
-	startIndex := 8
-	endIndex := len(filterString) - 1
-	if len(f.exprs) > 1 { //keep the parenthesis if we have more than one expression
-		startIndex--
-		endIndex++
+	// keep the parenthesis if we have more than one expression
+	if len(f.exprs) > 1 {
+		str = fmt.Sprintf("(%s)", str)
 	}
-	return &CustomQueryOperator{Expression: pointerizer.S(filterString[startIndex:endIndex])}
+
+	return &CustomQueryOperator{Expression: pointerizer.S(str)}
 }
