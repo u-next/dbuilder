@@ -56,6 +56,7 @@ func TestFilter_Has(t *testing.T) {
 	}
 	type args struct {
 		pred string
+		not  bool
 	}
 	tests := []struct {
 		name   string
@@ -81,7 +82,7 @@ func TestFilter_Has(t *testing.T) {
 				exprs: tt.fields.exprs,
 			}
 
-			got := f.Has(tt.args.pred).Build()
+			got := f.Has(tt.args.pred, tt.args.not).Build()
 
 			assert.Equal(t, tt.want, got)
 		})

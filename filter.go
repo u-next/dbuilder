@@ -38,10 +38,12 @@ func (f *Filter) Apply(pred string, op QueryOperatorable) *Filter {
 }
 
 // Has add has() function to determine if a node has a particular predicate
-func (f *Filter) Has(pred string) *Filter {
+// `not` controls whether a NOT operator should be appended to the front to
+// invert the results
+func (f *Filter) Has(pred string, not bool) *Filter {
 	f.exprs = append(f.exprs, &Expression{
 		fns: []function.Function{
-			function.NewHas(pred),
+			function.NewHas(pred, not),
 		},
 	})
 
